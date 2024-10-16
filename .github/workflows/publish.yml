@@ -22,8 +22,8 @@ jobs:
           gradle-version: 8.10
       
       - name: Assemble
-        run: ./gradle assemble
+        run: ./gradlew assemble
 
       - name: Publish Staging
-        run: ./gradle publish
+        run: ./gradlew publish
 
