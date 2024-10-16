@@ -10,6 +10,8 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'maven-publish'
+    id 'org.jreleaser' version '1.14.0'
 }
 
 repositories {
@@ -42,4 +44,65 @@ java {
 application {
     // Define the main class for the application.
     mainClass = 'app.App'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'name.divitotawela.snadbox'
+            artifactId = 'app'
+
+            from components.java
+
+            pom {
+                name = 'app'
+                description = 'Sample application'
+                url = 'https://github.com/cdivitotawela/example-publish-central-gradle'
+                inceptionYear = '2024'
+                licenses {
+                    license {
+                        name = 'Apache-2.0'
+                        url = 'https://spdx.org/licenses/Apache-2.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'cdivitotawela'
+                        name = 'Chamimda Divitotawela'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/cdivitotawela/example-publish-central-gradle.git'
+                    developerConnection = 'scm:git:ssh://github.com/cdivitotawela/example-publish-central-gradle.git'
+                    url = 'http://github.com/cdivitotawela/example-publish-central-gradle'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+jreleaser {
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            //Portal Publisher API
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('target/staging-deploy')
+                }
+            }
+            
+        }
+    }
 }
