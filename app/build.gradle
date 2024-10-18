@@ -7,12 +7,17 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
     id 'maven-publish'
-    id 'org.jreleaser' version '1.14.0'
+    id "com.vanniktech.maven.publish" version "0.30.0"
 }
+
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -46,63 +51,36 @@ application {
     mainClass = 'app.App'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'name.divitotawela.snadbox'
-            artifactId = 'app'
+mavenPublishing {
+  coordinates("name.divitotawela.sandbox", "app", "0.0.1")
 
-            from components.java
+  pom {
+    name = "App"
+    description = "Example app"
+    inceptionYear = "2024"
+    url = "https://github.com/cdivitotawela/example.publish-central-gradle"
+    licenses {
+      license {
+        name = "The Apache License, Version 2.0"
+        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      }
+    }
+    developers {
+      developer {
+        id = "username"
+        name = "Chaminda"
+        url = "https://github.com/cdivitotawela/"
+      }
+    }
+    scm {
+      url = "https://github.com/cdivitotawela/example.publish-central-gradle"
+      connection = "scm:git:git://github.com/cdivitotawela/example.publish-central-gradle.git"
+      developerConnection = "scm:git:ssh://git@github.com/cdivitotawela/example.publish-central-gradle.git"
+    }
+  }
 
-            pom {
-                name = 'app'
-                description = 'Sample application'
-                url = 'https://github.com/cdivitotawela/example-publish-central-gradle'
-                inceptionYear = '2024'
-                licenses {
-                    license {
-                        name = 'Apache-2.0'
-                        url = 'https://spdx.org/licenses/Apache-2.0.html'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'cdivitotawela'
-                        name = 'Chamimda Divitotawela'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/cdivitotawela/example-publish-central-gradle.git'
-                    developerConnection = 'scm:git:ssh://github.com/cdivitotawela/example-publish-central-gradle.git'
-                    url = 'http://github.com/cdivitotawela/example-publish-central-gradle'
-                }
-            }
-        }
-    }
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    repositories {
-        maven {
-            url = layout.buildDirectory.dir('staging-deploy')
-        }
-    }
-}
-
-jreleaser {
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-    deploy {
-        maven {
-            //Portal Publisher API
-            mavenCentral {
-                sonatype {
-                    active = 'ALWAYS'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    stagingRepository('target/staging-deploy')
-                }
-            }
-            
-        }
-    }
+  signAllPublications()
 }
